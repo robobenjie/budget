@@ -1,0 +1,14 @@
+(ns budget.handler
+  (:use compojure.core
+        recipe.manage-redis)
+  (:require [compojure.handler :as handler]
+            [compojure.route :as route]))
+
+(defroutes app-routes
+  (GET "/" [username] (str "Hello World " username))
+  (POST "/" [amount] 
+    (process-transaction {:amount amount}
+  (route/not-found "Not Found"))
+
+(def app
+  (handler/site app-routes))

@@ -1,0 +1,9 @@
+.center {
+    text-align:center;
+}
+
+#graph {
+    width : 200px;
+    height: 150px;
+    margin: 8px auto;
+}
