@@ -40,7 +40,14 @@
                            (:time t)))
                          curr]))))))
 
-
+(defn render-transaction-list [transactions]
+  [:table.table
+   (map 
+    #(let [amount (. Integer parseInt (% :amount))
+          display-time (unparse (formatters :date) (parse (formatters :date-hour-minute-second) (% :time)))]
+      (vector :tr {:class (if (> 0 amount) "success" "")}
+        [:td display-time] [:td (% :item)] [:td (. Math abs amount)]))
+   transactions)])
 
 (defn render-main [account-name]
   (let [[transactions total] (account-fetch account-name)]
@@ -70,6 +77,7 @@
                   [:input {:type "number" :placeholder "Round up to the nearest dollar", :name "amount", :id "amount"}]]
 				 [:div.form-actions
                   [:input {:class "btn btn-primary" :type "submit"}]]]]
+              (render-transaction-list transactions)
                ]]]
        [:script {:type "text/javascript"} (str "d1=" (comma-seperate (plot-data transactions total))";"
                                                "d2=" (comma-seperate (target-data :TODO total)) ";")]
