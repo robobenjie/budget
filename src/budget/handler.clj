@@ -8,8 +8,9 @@
 (defroutes app-routes
   (GET "/" [] (render-main "benjie"))
   (POST "/update" {params :params}
-	(process-transaction "benjie" params)
-	(render-main "benjie"))
+    (let [error (process-transaction "benjie" params)]
+      (if error error
+	    "<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=/\">")))
   (route/resources "/")
   (route/not-found "Not Found"))
 

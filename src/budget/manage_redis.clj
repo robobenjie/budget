@@ -25,6 +25,7 @@
      (car/decrby (str ":total:" account-name) (:amount data))
      (car/lpush  (transaction-key account-name (unparse dateformat (local-now))) 
                  (assoc data :time (unparse (formatters :date-hour-minute-second) time-obj))))
+     nil
     (catch Exception e "<h1> I didn't understand that number format. <a href=\"/\"> Go Back </a></h1>"))))
 (defn account-fetch 
   ([account-name] 
