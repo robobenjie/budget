@@ -9,8 +9,8 @@
   (GET "/" [] (render-main "benjie"))
   (POST "/update" {params :params}
     (let [error (process-transaction "benjie" params)]
-      (if error error
-	    "<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=/\">")))
+      (if error (render-message error 5)
+	    (render-message (random-affirmation) 1))))
   (route/resources "/")
   (route/not-found "Not Found"))
 

@@ -54,7 +54,7 @@
     (println (plot-data transactions total))
     (html5
       [:head
-        [:title (str "Savings for " account-name)]
+        [:title (str "Savings for Benjie and Stephanie")]
         (include-css "/css/bootstrap.css")
         (include-css "/css/budget.css")
         (include-css "/css/bootstrap-responsive.css")
@@ -83,3 +83,21 @@
                                                "d2=" (comma-seperate (target-data :TODO total)) ";")]
        (include-js "/scripts/flotr2.min.js")
        (include-js "/scripts/make_plot.js")])))
+
+(defn render-message [message-markup wait-time]
+  (html5
+    [:head
+     [:meta {:HTTP-EQUIV "REFRESH" :content (str wait-time "; url=/")}]
+     [:title (str "Savings for Benjie and Stephanie")]
+     (include-css "/css/bootstrap.css")
+     (include-css "/css/budget.css")
+     (include-css "/css/bootstrap-responsive.css")
+     [:meta {:name "viewport", :content "width=device-width, initial-scale=1.0"}]]
+   [:body 
+    [:div.container-fluid
+          [:div.row-fluid
+            [:div.span3
+         	  [:div.well
+                [:h1.center message-markup]]]]]]))
+(defn random-affirmation []
+  (rand-nth ["OK" "Great!" "Nice" "Good choice" "I like it!" "Sweet" "Awesome" "Rock on" "Thanks" ]))

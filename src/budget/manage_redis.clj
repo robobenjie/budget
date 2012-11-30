@@ -26,7 +26,7 @@
      (car/lpush  (transaction-key account-name (unparse dateformat (local-now))) 
                  (assoc data :time (unparse (formatters :date-hour-minute-second) time-obj))))
      nil
-    (catch Exception e "<h1> I didn't understand that number format. <a href=\"/\"> Go Back </a></h1>"))))
+    (catch Exception e "I didn't understand that number format. <a href=\"/\"> Go Back </a>"))))
 (defn account-fetch 
   ([account-name] 
    (let [[transactions amount] (account-fetch account-name (unparse dateformat (local-now)))]
