@@ -1,6 +1,7 @@
 (ns budget.manage-redis
   (:require [taoensso.carmine :as car])
-  (use [clj-time format local]))
+  (use [clj-time format local]
+       budget.constants))
 
 (def dateformat (formatter "yyyyMM"))
 
@@ -36,10 +37,10 @@
          (println "filling month")
          (process-transaction 
            account-name 
-           {:amount "-5000", :name "Monthly refresh" :account account-name}
+           {:amount (str "-" monthly-budget), :name "Monthly refresh" :account account-name}
            (first-of-the-month (local-now)))
           (account-fetch account-name)))))
   ([account-name month]
     (wcar
-      (car/lrange (transaction-key account-name month) 0 500)
+      (car/lrange (transaction-key account-name month) 0 5000)
       (car/get (str ":total:" account-name)))))

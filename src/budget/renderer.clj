@@ -1,8 +1,8 @@
 (ns budget.renderer
   (:use [hiccup core page]
         budget.manage-redis
+        budget.constants
    		[clj-time local core format]))
-
 (defn comma-seperate [l]
   (if 
     (coll? l)
@@ -16,7 +16,7 @@
     l))
 
 (defn target-data [time-obj total]
-	[[1 5000] [30 0]])
+	[[1 monthly-budget] [30 0]])
 
 (defn days-since-first [time-obj]
   (float (inc (/ (in-secs (interval 
@@ -24,7 +24,7 @@
           time-obj))
      (* 60 60 24)))))
 
-(defn plot-data [transactions total]
+(defn plot-data [transactions total function]
     (loop [trans transactions
        curr (. Integer parseInt total)
        retval [[(days-since-first (local-now)) total]]]
@@ -33,12 +33,11 @@
          (let [t (first trans)]
            (recur (rest trans) 
                   (+ curr (. Integer parseInt (:amount t)))
-                  (conj retval 
-                        [(days-since-first 
-                          (parse 
-                           (formatters :date-hour-minute-second)
-                           (:time t)))
-                         curr]))))))
+                  (let [x (days-since-first 
+                            (parse 
+                             (formatters :date-hour-minute-second)
+                             (:time t)))]
+                    (conj retval [x (function x curr)])))))))
 
 (defn render-transaction-list [transactions]
   [:table.table
@@ -51,7 +50,6 @@
 
 (defn render-main [account-name]
   (let [[transactions total] (account-fetch account-name)]
-    (println (plot-data transactions total))
     (html5
       [:head
         [:title (str "Savings for Benjie and Stephanie")]
@@ -79,11 +77,14 @@
                   [:input {:class "btn btn-primary" :type "submit"}]]]]
               (render-transaction-list transactions)
                ]]]
-       [:script {:type "text/javascript"} (str "d1=" (comma-seperate (plot-data transactions total))";"
-                                               "d2=" (comma-seperate (target-data :TODO total)) ";")]
+       [:script {:type "text/javascript"} 
+        (str "d1=" (comma-seperate (plot-data transactions total (fn[x y] y)))";"
+             "d2=" (comma-seperate (target-data :TODO total)) ";"
+             "savings" (comma-seperate (plot-data transactions total (fn[x y] (+ y -5000 (* x 5000 (/ 1 30)))))) ";"
+             )]
        (include-js "/scripts/flotr2.min.js")
        (include-js "/scripts/make_plot.js")])))
-
+(/ 1 30)
 (defn render-message [message-markup wait-time]
   (html5
     [:head
