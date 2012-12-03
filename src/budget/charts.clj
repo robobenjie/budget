@@ -29,7 +29,7 @@
 (defn plot-data [transactions total f]
     (loop [trans transactions
        curr (. Integer parseInt total)
-       retval [[(days-since-first (local-now)) total]]]
+       retval [[(days-since-first (local-now)) (f (days-since-first (local-now)) (. Integer parseInt total))]]]
        (if (empty? trans)
         retval
          (let [t (first trans)
