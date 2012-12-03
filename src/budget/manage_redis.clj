@@ -1,6 +1,6 @@
 (ns budget.manage-redis
   (:require [taoensso.carmine :as car])
-  (use [clj-time format local]
+  (:use [clj-time format local]
        budget.constants))
 
 (def dateformat (formatter "yyyyMM"))

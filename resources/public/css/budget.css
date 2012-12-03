@@ -2,8 +2,15 @@
     text-align:center;
 }
 
-#graph {
+.chart {
     width : 200px;
     height: 150px;
     margin: 8px auto;
+}
+
+h1 h2 h3 h4 h5 h6 {
+  margin: 0px;
+}
+div.well {
+  margin-bottom: 15px;
 }

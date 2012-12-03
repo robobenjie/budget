@@ -2,42 +2,8 @@
   (:use [hiccup core page]
         budget.manage-redis
         budget.constants
+       	budget.charts
    		[clj-time local core format]))
-(defn comma-seperate [l]
-  (if 
-    (coll? l)
-    (str 
-     "["
-     (reduce 
-      #(str % ", " (comma-seperate %2))
-      (comma-seperate (first l))
-      (rest l))
-     "]")
-    l))
-
-(defn target-data [time-obj total]
-	[[1 monthly-budget] [30 0]])
-
-(defn days-since-first [time-obj]
-  (float (inc (/ (in-secs (interval 
-          (first-of-the-month time-obj)
-          time-obj))
-     (* 60 60 24)))))
-
-(defn plot-data [transactions total function]
-    (loop [trans transactions
-       curr (. Integer parseInt total)
-       retval [[(days-since-first (local-now)) total]]]
-       (if (empty? trans)
-         (conj retval [1 curr])
-         (let [t (first trans)]
-           (recur (rest trans) 
-                  (+ curr (. Integer parseInt (:amount t)))
-                  (let [x (days-since-first 
-                            (parse 
-                             (formatters :date-hour-minute-second)
-                             (:time t)))]
-                    (conj retval [x (function x curr)])))))))
 
 (defn render-transaction-list [transactions]
   [:table.table
@@ -53,9 +19,12 @@
     (html5
       [:head
         [:title (str "Savings for Benjie and Stephanie")]
+        (include-css "/css/swipe.css")
         (include-css "/css/bootstrap.css")
         (include-css "/css/budget.css")
         (include-css "/css/bootstrap-responsive.css")
+        (include-js "/scripts/flotr2.min.js")
+       (include-js "/scripts/swipe.min.js")
         [:meta {:name "viewport", :content "width=device-width, initial-scale=1.0"}]]
       [:body
         [:div.container-fluid
@@ -63,7 +32,15 @@
             [:div.span3
          	  [:div.well
                 [:h1.center (str "$" total)]]
-              [:div#graph]
+              [:div#chart-slider 
+               [:ul
+                [:li 
+                  (render-chart "money-left" transactions total 
+                            (fn[x y] y)
+                            (fn[x y] (- monthly-budget (* x monthly-budget 0.033333))))]
+                [:li 
+                   (render-chart "extra savings" transactions total
+							(fn[x y] (- y (- monthly-budget (* x monthly-budget 0.033333)))))]]]
               [:form {:method "post" :action "/update"}
                	[:input {:type "hidden" :value account-name :name "account", :id "account"}]
                 [:fieldset
@@ -76,15 +53,11 @@
 				 [:div.form-actions
                   [:input {:class "btn btn-primary" :type "submit"}]]]]
               (render-transaction-list transactions)
-               ]]]
-       [:script {:type "text/javascript"} 
-        (str "d1=" (comma-seperate (plot-data transactions total (fn[x y] y)))";"
-             "d2=" (comma-seperate (target-data :TODO total)) ";"
-             "savings" (comma-seperate (plot-data transactions total (fn[x y] (+ y -5000 (* x 5000 (/ 1 30)))))) ";"
-             )]
-       (include-js "/scripts/flotr2.min.js")
-       (include-js "/scripts/make_plot.js")])))
-(/ 1 30)
+              [:script {:type "text/javascript"} 
+                "new Swipe(document.getElementById('chart-slider'));"]
+               ]]]]
+       )))
+
 (defn render-message [message-markup wait-time]
   (html5
     [:head
