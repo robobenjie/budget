@@ -30,7 +30,7 @@
     (loop [trans transactions
        curr (. Integer parseInt total)
        retval [[(days-since-first (local-now)) (f (days-since-first (local-now)) (. Integer parseInt total))]]]
-       (if (empty? trans)
+       (if (= 1 (count trans))
         retval
          (let [t (first trans)
                curr-total (+ curr (. Integer parseInt (:amount t)))]
