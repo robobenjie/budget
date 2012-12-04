@@ -18,6 +18,7 @@
   (let [[transactions total] (account-fetch account-name)]
     (html5
       [:head
+       	[:meta {:name "apple-mobile-web-app-capable" :content "yes"}]
         [:title (str "Savings for Benjie and Stephanie")]
         (include-css "/css/swipe.css")
         (include-css "/css/bootstrap.css")
