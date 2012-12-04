@@ -36,12 +36,15 @@
               [:div#chart-slider 
                [:ul
                 [:li 
-                  (render-chart "money-left" transactions total 
-                            (fn[x y] y)
-                            (fn[x y] (- monthly-budget (* x monthly-budget 0.033333))))]
+                   (render-chart "Extra savings" transactions total plot-budget-left
+							(fn[x y] (- y (- monthly-budget (* x monthly-budget 0.033333)))))]
                 [:li 
-                   (render-chart "extra savings" transactions total
-							(fn[x y] (- y (- monthly-budget (* x monthly-budget 0.033333)))))]]]
+                   (render-chart "Spent" transactions total plot-total-spent
+							(fn[x y] y))]
+                [:li 
+                   (render-chart "Money left" transactions total plot-budget-left
+                            (fn[x y] y)
+                            (fn[x y] (- monthly-budget (* x monthly-budget 0.033333))))]]]
               [:form {:method "post" :action "/update"}
                	[:input {:type "hidden" :value account-name :name "account", :id "account"}]
                 [:fieldset
