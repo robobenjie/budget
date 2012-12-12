@@ -14,6 +14,18 @@
         [:td display-time] [:td (% :item)] [:td (. Math abs amount)]))
    transactions)])
 
+(time (let [[transactions total] (account-fetch "benjie")]
+        (render-chart "Extra savings" transactions total plot-budget-left
+							(fn[x y] (- y (- monthly-budget (* x monthly-budget 0.033333)))))
+        (render-chart "Spent" transactions total plot-total-spent
+							(fn[x y] y))
+        (render-chart "Money left" transactions total plot-budget-left
+                            (fn[x y] y)
+                            (fn[x y] (- monthly-budget (* x monthly-budget 0.033333))))
+        "foo"
+
+        ))
+
 (defn render-main [account-name]
   (let [[transactions total] (account-fetch account-name)]
     (html5

@@ -46,7 +46,6 @@
   	(loop [trans (reverse transactions)
            spent 0
            retval [[0 (f 0 0)]]]
-      (println trans spent retval)
       (if (empty? trans)
         retval
         (let [t (first trans)
