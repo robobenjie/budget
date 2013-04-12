@@ -7,10 +7,10 @@
             [compojure.route :as route]))
 
 (defroutes app-routes
-  (GET "/" [] 
+  (GET "/" [month] 
     (if (session-get :username)
-        (render-main (session-get :username))
-        (render-login)))
+       (render-main (session-get :username) month)
+       (render-login)))
   (POST "/signup" {params :params}
     (let [[message success] (try-signup params)]
       (render-message message 2)))

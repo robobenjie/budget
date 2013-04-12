@@ -52,15 +52,19 @@
          [:div.form-actions [:input {:class "btn btn-primary" :type "submit"}]]]
 ]))
 
-(defn render-main [account-name]
-  (let [[transactions total account-string monthly-budget] (account-fetch account-name)]
-   (println "account fetch: " (account-fetch account-name))
+   
+(defn render-main [account-name month-string]
+  (println "month" month-string)
+    (let [month (if month-string (parse dateformat month-string) (first-of-the-month (local-now)))
+          is-current-month (= month (first-of-the-month (local-now)))
+          [transactions total account-string monthly-budget] (if month-string (account-fetch account-name (unparse dateformat month)) (account-fetch account-name))]
       (page-wrap
         [[:div.container-fluid
           [:div.row-fluid
             [:div.span3
          	  [:div.well
-                [:h1.center (str "$" total)]]
+                [:h1.center (if is-current-month (str "$" total) (unparse (formatters :year-month) month))]]
+             (if (= 0 (count transactions)) [:p.text-warning "no transactions for this month"]
               [:div#chart-slider 
                [:ul
                 [:li 
@@ -72,7 +76,7 @@
                 [:li 
                    (render-chart "Money left" transactions total plot-budget-left
                             (fn[x y] y)
-                            (fn[x y] (- monthly-budget (* x monthly-budget 0.033333))))]]]
+                            (fn[x y] (- monthly-budget (* x monthly-budget 0.033333))))]]])
               [:form {:method "post" :action "/update"}
                	[:input {:type "hidden" :value account-name :name "account", :id "account"}]
                 [:fieldset
@@ -84,12 +88,17 @@
                   [:input {:type "number" :placeholder "Round up to the nearest dollar", :name "amount", :id "amount"}]]
 				 [:div.form-actions
                   [:input {:class "btn btn-primary" :type "submit"}]]]]
+              [:a.btn {:href (str "/?month=" (previous-month-string month))} "Prev"]
+              [:a (if is-current-month
+                      {:class "btn disabled pull-right"}
+                      {:class "btn pull-right" :href (str "/?month=" (next-month-string month))})
+                  "Next"]
+              [:hr]
               (render-transaction-list transactions account-name)
               [:a.btn {:href "/logout"} "Logout"]
               [:script {:type "text/javascript"} 
                 "new Swipe(document.getElementById('chart-slider'));"]
-               ]]]]
-       )))
+               ]]]])))
 
 (defn render-message [message-markup wait-time]
   (html5

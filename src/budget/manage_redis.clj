@@ -1,6 +1,6 @@
 (ns budget.manage-redis
   (:require [taoensso.carmine :as car])
-  (:use [clj-time format local]
+  (:use [clj-time format local core]
        budget.constants))
 
 (def dateformat (formatter "yyyyMM"))
@@ -16,7 +16,13 @@
   (str ":transactions:" month ":" account-name))
 
 (defn first-of-the-month [time-obj]
-  (parse (formatter "YYYYMM") (unparse (formatter "YYYYMM") time-obj)))
+  (parse dateformat (unparse dateformat time-obj)))
+
+(defn previous-month-string [time-obj]
+   (unparse dateformat (plus (first-of-the-month time-obj) (weeks -2))))
+
+(defn next-month-string [time-obj]
+   (unparse dateformat (plus (first-of-the-month time-obj) (weeks 6))))
 
 (defn try-signup [params]
   (try 

@@ -24,7 +24,6 @@
 
 
 (defn plot-budget-left [transactions total f]
-    (println transactions total)
     (loop [trans transactions
        curr (. Integer parseInt total)
        retval [[(days-since-first (local-now)) (f (days-since-first (local-now)) (. Integer parseInt total))]]]
