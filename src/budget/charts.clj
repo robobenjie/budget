@@ -3,20 +3,17 @@
         budget.manage-redis
         [clj-time core format local]))
 
-(defn comma-seperate [l]
+(defn comma-separate [l]
   (if 
     (coll? l)
     (str 
      "["
      (reduce 
-      #(str % ", " (comma-seperate %2))
-      (comma-seperate (first l))
+      #(str % ", " (comma-separate %2))
+      (comma-separate (first l))
       (rest l))
      "]")
     l))
-
-(defn target-data [time-obj total]
-	[[1 monthly-budget] [30 0]])
 
 (defn days-since-first [time-obj]
   (float (inc (/ (in-secs (interval 
@@ -27,6 +24,7 @@
 
 
 (defn plot-budget-left [transactions total f]
+    (println transactions total)
     (loop [trans transactions
        curr (. Integer parseInt total)
        retval [[(days-since-first (local-now)) (f (days-since-first (local-now)) (. Integer parseInt total))]]]
@@ -72,7 +70,7 @@
     [:div.chart {:id chart-name}]
     [:script {:type "text/javascript"} 
     	(str "Flotr.draw(document.getElementById('" chart-name "'),"
-		  (comma-seperate
+		  (comma-separate
             (map #(data-parser transactions total %) functions))
           ","
 	      chart-options
