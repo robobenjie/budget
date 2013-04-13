@@ -13,7 +13,8 @@
   (GET "/" {{month :month} :params cookies :cookies}
     (println "got:" month cookies) 
     (if (session-get :username)
-       (render-main (session-get :username) month)
+       {:body    (render-main (session-get :username) month)
+        :cookies (assoc-in cookies ["ring-session" :max-age] (* 3600 24 365))}
        (render-login)))
   (POST "/signup" {params :params}
     (let [[message success] (try-signup params)]
@@ -23,8 +24,7 @@
           (try-login params)]
        (if username
          (session-put! :username username))
-         {:body (render-message message 2)
-          :cookies (assoc-in cookies ["ring-session" :max-age] (* 3600 24 365))}))
+         {:body (render-message message 2)}))
   (GET "/logout" []
      (session-delete-key! :username)
      (render-message "logged out" 3))
