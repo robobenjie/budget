@@ -25,7 +25,8 @@
         (include-css "/css/budget.css")
         (include-css "/css/bootstrap-responsive.css")
         (include-js "/scripts/flotr2.min.js")
-       (include-js "/scripts/swipe.min.js")
+        (include-js "/scripts/swipe.min.js")
+        (include-js "/scripts/no_safari.js")
         [:meta {:name "viewport", :content "width=device-width, initial-scale=1.0"}]]
       (concat []
         main-content)))
