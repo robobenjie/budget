@@ -2,24 +2,29 @@
   (:use compojure.core
         budget.manage-redis
         budget.renderer
+        [ring.middleware.cookies        :only [wrap-cookies]]
+        [ring.middleware.params         :only [wrap-params]]
+        [ring.middleware.keyword-params :only [wrap-keyword-params]]
 	(sandbar stateful-session))
   (:require [compojure.handler :as handler]
             [compojure.route :as route]))
 
 (defroutes app-routes
-  (GET "/" [month] 
+  (GET "/" {{month :month} :params cookies :cookies}
+    (println "got:" month cookies) 
     (if (session-get :username)
        (render-main (session-get :username) month)
        (render-login)))
   (POST "/signup" {params :params}
     (let [[message success] (try-signup params)]
       (render-message message 2)))
-  (POST "/login" {params :params}
+  (POST "/login" {params :params cookies :cookies}
     (let [[message username]
           (try-login params)]
        (if username
          (session-put! :username username))
-         (render-message message 2)))
+         {:body (render-message message 2)
+          :cookies (assoc-in cookies ["ring-session" :max-age] (* 3600 24 365))}))
   (GET "/logout" []
      (session-delete-key! :username)
      (render-message "logged out" 3))
@@ -32,4 +37,7 @@
 
 (def app
   (-> (handler/site app-routes)
-     wrap-stateful-session))
+     wrap-stateful-session
+     wrap-cookies
+     wrap-keyword-params
+     wrap-params))
